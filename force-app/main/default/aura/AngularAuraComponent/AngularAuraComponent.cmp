@@ -1,0 +1,5 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" access="global" >
+    <div style="position:absolute; width:100%; height: 100%">
+        <lightning:container  src="{!$Resource.myreactapp + '/index.html'}" /> 
+    </div>
+</aura:component>

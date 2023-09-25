@@ -1,0 +1,344 @@
+<aura:component description="DefectFromCase" controller='DefectFromCaseController' implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:actionOverride,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+	 <!--Custom Width Increase -->
+    <ltng:require styles="{!$Resource.PlatinumPMO__PopupCSS}" /> 
+    <!--Attribute Declearation Start-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="selectedOrganizationLookUpRecord" type="sObject" default="" />
+    <aura:attribute name="selectedPortfolioLookUpRecord" type="sObject" default="" />
+    <aura:attribute name="selectedProgramLookUpRecord" type="sObject" default="" />
+    <aura:attribute name="selectedProjectLookUpRecord" type="sObject" default="" />
+     <aura:attribute name="historicalComment" type="String" default="" />
+    <aura:attribute name="defectLog" type="PlatinumPMO__Defect_Log__c" default="{'sObjectType':'PlatinumPMO__Defect_Log__c'}"/>
+   
+   
+    <aura:attribute name="defectName" type="String" default=""/>
+    <aura:attribute name="defectDescription" type="String" default=""/>
+    <aura:attribute name="defectCause" type="String" default=""/> 
+    <aura:attribute name="proposedResolution" type="String" default=""/>
+    <aura:attribute name="TypesOfDefect" type="String" default=""/>
+    <aura:attribute name="ProjectPhase" type="String" default=""/>
+     <aura:attribute name="priority" type="String" default=""/>
+    <aura:attribute name="severity" type="String" default=""/>
+    <aura:attribute name="changeRequest" type="Boolean" default=""/>
+    <aura:attribute name="integrationImpact" type="String" default=""/>
+    <aura:attribute name="selectedDeliverableLookUpRecord" type="sObject" default="" />
+    <aura:attribute name="selectedSystemLookUpRecord" type="sObject" default="" />
+    <aura:attribute name="selectedbusinessTransactionImpactedLookUpRecord" type="sObject" default="" />
+    <aura:attribute name="selecteddefectCoordinatorLookUpRecord" type="sObject" default="" />
+    <aura:attribute name="selecteddefectOwnerLookUpRecord" type="sObject" default="" />
+    <aura:attribute name="selecteddefectResolutionSignoffLookUpRecord" type="sObject" default="" />
+    <aura:attribute name="objective" type="String" default="" />
+    <aura:attribute name="wCUobject" type="String" default="" />
+    <aura:attribute name="prpsdRsuln" type="String" default="" />
+    <aura:attribute name="decrp" type="String" default="" />
+    <aura:attribute name="dftdecs" type="String" default="" />
+    <aura:attribute name="selectedassoTestPlanLookUpRecord" type="sObject" default="" />
+    <aura:attribute name="assoTestPlanId" type="sObject" default="" />
+    <aura:attribute name="testPlanDetailLookUpRecord" type="sObject" default="" />
+    <aura:attribute name="exampleUrl" type="String" default=""/>
+    <aura:attribute name="estimatedEfforts" type="Integer" default=""/>
+    <aura:attribute name="testStep" type="String" default=""/>
+    <aura:attribute name="estimatedResolution" type="DateTime" default=""/>
+    <aura:attribute name="OrganizationId" type="String" default=""/>
+    <aura:attribute name="PortfolioId" type="String" default=""/>
+    <aura:attribute name="ProgramId" type="String" default=""/>
+    <aura:attribute name="ProjectId" type="String" default=""/>
+    <aura:attribute name="testPlanDetailId" type="String" default=""/>
+    <aura:attribute name="testPlanId" type="String" default=""/>
+    <aura:attribute name="typeOfDefect" type="String" default=""/>
+    <aura:attribute name="showError" type="Boolean" default="false"/>
+     <!--Spinner Attribute Added-->
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:handler action="{!c.hideSpinner}" event="aura:doneWaiting"/>
+    <!--Attribute Declearation End-->
+    <!--Pick List Values Supported Attributes : Start-->
+    <aura:attribute name="projectPhases" type="Object" default="" />
+    <aura:attribute name="typeOfDefects" type="Object" default="" />
+    <aura:attribute name="defectPriorities" type="Object" default="" />
+    <aura:attribute name="defectSeverities" type="Object" default="" />
+    <aura:attribute name="integrationImpacts" type="Object" default="" />
+    <aura:attribute name="SelectedOrgRecordId" type="String" default=""/>
+    <aura:attribute name="SelectedPortRecordId" type="String" default=""/>
+    <aura:attribute name="SelectedProgRecordId" type="String" default=""/>
+    <aura:attribute name="SelectedProjectRecordId" type="String" default=""/>
+    <!--Pick List Values Supported Attributes : End-->
+
+     <!--<aura:if isTrue="{!v.showError}">
+        <div class="slds-theme_error">
+            <span class="slds-assistive-text">error</span>
+            <div class="">
+                <p class="slds-align_absolute-center">{!v.errorMessage}</p>
+            </div>
+        </div>
+    </aura:if>-->
+    <aura:handler name="change" value="{!v.selectedOrganizationLookUpRecord}" action="{!c.orgValueChange}"/>
+    <aura:handler name="change" value="{!v.selectedPortfolioLookUpRecord}" action="{!c.portfolioValueChange}"/>
+    <aura:handler name="change" value="{!v.selectedProgramLookUpRecord}" action="{!c.progValueChange}"/>
+    <aura:handler name="change" value="{!v.selectedProjectLookUpRecord}" action="{!c.projectValueChange}"/>
+    <div class="slds-modal__header slds-text-heading_medium">                
+        <b>New Defect Log</b>
+    </div>
+    <div class="slds-modal__content slds-var-p-around_medium slds-grid slds-wrap ">
+        <!--Create a blank space by 1/2 -->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/>
+        <!--General Information Header-->
+        <div class="slds-page-header slds-size_1-of-1 slds-var-p-horizontal_xx-small" style="cursor: pointer;" >
+            <section class="slds-clearfix">
+                <div class="slds-float_left">
+                    
+                    <lightning:icon class="slds-hide" aura:id="articleTwo" iconName="utility:dash" size="xx-small" alternativeText="Indicates dash"/>
+                </div>
+                <div class="slds-var-m-left_small">General Information </div>
+            </section>
+        </div>
+        <!--General Information Header End-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/>
+        <!--Organization Lookup-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <c:ServiceCloudCustomLookup objectAPIName="PlatinumPMO__Organization__c"  IconName="custom:custom39" label="Associated Organization" selectedRecord="{!v.selectedOrganizationLookUpRecord}"  ParentObjectName=""  BrokerId="{!v.OrganizationId}"/>
+        </div> 
+        <!--Portfolio Lookup-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <c:ServiceCloudCustomLookup objectAPIName="PlatinumPMO__Portfolio__c" SelectedOrgRecordId="{!v.SelectedOrgRecordId}" IconName="custom:custom36" label="Associated Portfolio" selectedRecord="{!v.selectedPortfolioLookUpRecord}"  ParentObjectName="" BrokerId="{!v.PortfolioId}"/>
+        </div>
+        <!--Program Lookup-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <c:ServiceCloudCustomLookup objectAPIName="PlatinumPMO__Program__c" SelectedPortfolioRecordId="{!v.SelectedPortRecordId}" IconName="custom:custom21" label="Program" selectedRecord="{!v.selectedProgramLookUpRecord}"  ParentObjectName="" BrokerId="{!v.ProgramId}"/>        
+        </div>
+        <!--Project Lookup-->  
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <c:ServiceCloudCustomLookup objectAPIName="PlatinumPMO__Project__c" IconName="custom:custom99" label="Project" selectedRecord="{!v.selectedProjectLookUpRecord}"  ParentObjectName="" BrokerId="{!v.ProjectId}" SelectedProgramRecordId="{!v.SelectedProgRecordId}"/>
+        </div> 
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/>
+        <!-- Defect Details Header Starts-->
+        <div class="slds-page-header slds-size_1-of-1 slds-var-p-horizontal_xx-small" style="cursor: pointer;" >
+            <section class="slds-clearfix">
+                <div class="slds-float_left">
+                    
+                    <lightning:icon class="slds-hide" aura:id="articleTwo" iconName="utility:dash" size="xx-small" alternativeText="Indicates dash"/>
+                </div>
+                <div class="slds-var-m-left_small">Defect Details </div>
+            </section>
+        </div>
+        <!-- Defect Details Header End-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/>
+        <!--Defect Name Input text field max length 80-->
+        <lightning:input aura:id="DefName"  name="Defect Name" label="Defect Name" value="{!v.defectLog.Name}" required="true" class="slds-size_1-of-1 slds-var-p-horizontal_x-small" maxlength="80"/>
+        <br/>
+        <!-- Defect Description Rich text field area-->
+        &nbsp; Defect Description: &nbsp;
+        <lightning:inputRichText value="{!v.dftdecs}" label="Defect Description" placeholder="" class="slds-size_1-of-1 slds-var-p-horizontal_x-small" aura:id="decrp">
+            <lightning:insertImageButton/>
+        </lightning:inputRichText>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/>
+        <!--Types of Defect picklist field--> 
+        
+        <lightning:select aura:id="typeOfDefect" name="typeOfDefect" label="Type of Defect Condition"  required = "true" value="{!v.typeOfDefect}" class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <aura:iteration items="{!v.typeOfDefects}" var="item">
+                <option value="{!item}">{!item}</option>
+            </aura:iteration>
+        </lightning:select>
+        <!--Project Phase Picklist field-->
+        
+        <lightning:select aura:id="ProjectPhase" name="ProjectPhase" label="Project Phase" required = "true" value="{!v.ProjectPhase}" class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <aura:iteration items="{!v.projectPhases}" var="item">
+                <option value="{!item}">{!item}</option>
+            </aura:iteration>
+        </lightning:select>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/>
+        <!--Priority Picklist field-->
+        <lightning:select aura:id="DefectPriority" name="DefectPriority" label="Priority" required = "true" value="{!v.priority}" class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <aura:iteration items="{!v.defectPriorities}" var="item">
+                <option value="{!item}">{!item}</option>
+            </aura:iteration>
+        </lightning:select>
+        <!--Associated Deliverable lookup field-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <c:ServiceCloudCustomLookup objectAPIName="PlatinumPMO__Deliverable__c" label="Associated Deliverable" require = "true" IconName="custom:custom64" selectedRecord="{!v.selectedDeliverableLookUpRecord}"   SelectedProjectRecordId="{!v.SelectedProjectRecordId}"  BrokerId="{!v.AssoDeliverableId}"/>
+        </div> 
+        <!--Severity Picklist field-->
+        
+        <lightning:select aura:id="severity" name="severity" required = "true" label="Severity" value="{!v.severity}" class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <aura:iteration items="{!v.defectSeverities}" var="item">
+                <option value="{!item}">{!item}</option>
+            </aura:iteration>
+        </lightning:select>
+        <!--Associated System lookup field-->
+        
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <c:ServiceCloudCustomLookup objectAPIName="PlatinumPMO__System__c" require = "true" IconName="custom:custom59" label="Associated System" selectedRecord="{!v.selectedSystemLookUpRecord}"  ParentObjectName="" onObjectName="PlatinumPMO__Defect_Log__c"  BrokerId="{!v.AssoSystemId}" SelectedProgramRecordId="{!v.SelectedProgRecordId}"/>
+        </div>  
+        
+        <br/>
+        <!--Change Request check box field-->
+        
+        
+        <!--<ui:inputCheckbox aura:id="checkbox" label="Change Request" change="{!c.onCheck}"/>-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">   
+            &nbsp;Change Request?&nbsp;&nbsp; <lightning:helpText content="If this defect truly a change request to the original specification? If Yes then check this box."/>&nbsp;&nbsp;&nbsp;<br/><ui:inputCheckbox aura:id="changeRequest" value="{!v.changeRequest}"/> 
+        </div>   
+        
+        <!--Business Transaction Impacted lookup field-->
+        
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <c:ServiceCloudCustomLookup objectAPIName="PlatinumPMO__Business_Transaction_Ownership_Library__c" require = "true" IconName="custom:custom29" label="Business Transactions Impacted" selectedRecord="{!v.selectedbusinessTransactionImpactedLookUpRecord}" onObjectName="PlatinumPMO__Defect_Log__c"  ParentObjectName=""  BrokerId="{!v.businessTransactionImpactedId}" SelectedProgramRecordId="{!v.SelectedProgRecordId}"/>
+        </div>  
+        <!--defect Coordinator lookup field-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <c:ServiceCloudCustomLookup objectAPIName="User" IconName="standard:user" label="Defect Coordinator" require = "true" selectedRecord="{!v.selecteddefectCoordinatorLookUpRecord}"  onObjectName="PlatinumPMO__Defect_Log__c" onProgram="{!v.ProgramId}"/>
+        </div>  
+     
+        
+        <!--Integration Impact picklist field-->
+        <lightning:select aura:id="integrationImpact" name="integrationImpact" label="Integration Impact" required = "true" value="{!v.integrationImpact}" class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <aura:iteration items="{!v.integrationImpacts}" var="item">
+                <option value="{!item}">{!item}</option>
+            </aura:iteration>
+        </lightning:select>
+        <!--defect Owner lookup field-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <c:ServiceCloudCustomLookup objectAPIName="User" IconName="standard:user" label="Defect Owner" selectedRecord="{!v.selecteddefectOwnerLookUpRecord}"  onObjectName="PlatinumPMO__Defect_Log__c"  BrokerId="{!v.defectOwnerId}" onProgram="{!v.ProgramId}"/>
+        </div>
+        
+        
+        <!--defect Resolution signoff lookup field-->
+        
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <c:ServiceCloudCustomLookup objectAPIName="User" IconName="standard:user" label="Defect Resolution Signoff" selectedRecord="{!v.selecteddefectResolutionSignoffLookUpRecord}"  onObjectName="PlatinumPMO__Defect_Log__c"  BrokerId="{!v.defectResolutionSignoffId}" onProgram="{!v.ProgramId}"/>
+        </div> 
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/>
+        
+        
+        
+        <!--What caused the defect rich text area field-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/>
+        &nbsp; What caused the defect?: &nbsp;
+        <lightning:inputRichText value="{!v.defectCause}" label="What caused the defect?" placeholder="" class="slds-size--1-of-1 slds-p-horizontal_xx-small" aura:id="wCUobject">
+            <lightning:insertImageButton/>
+        </lightning:inputRichText>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/>
+        <!--Proposed resolution rich text field area-->
+        
+        &nbsp; Proposed Resolution: &nbsp;
+        <lightning:inputRichText value="{!v.proposedResolution}" label="Proposed Resolution" placeholder="" class="slds-size--1-of-1 slds-p-horizontal_xx-small" aura:id="prpsdRsuln">
+            <lightning:insertImageButton/>
+        </lightning:inputRichText>
+        <div class="slds-size--1-of-1 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size--1-of-1 slds-var-p-horizontal_x-small"/>
+        <br/>
+        
+        <!-- Testing Details Header Starts-->
+        <div class="slds-page-header slds-size--1-of-1 slds-p-horizontal_xx-small" style="cursor: pointer;" >
+            <section class="slds-clearfix">
+                <div class="slds-float--left">
+                    
+                    <lightning:icon class="slds-hide" aura:id="articleTwo" iconName="utility:dash" size="xx-small" alternativeText="Indicates dash"/>
+                </div>
+                <div class="slds-m-left--small">Testing Details </div>
+            </section>
+        </div>
+        <!-- Testing Details Header End-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/>
+        <!--Associated test plan lookup field-->
+        
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <c:ServiceCloudCustomLookup objectAPIName="PlatinumPMO__Test_Plan__c" IconName="custom:custom14" label="Associated Test Plan" selectedRecord="{!v.selectedassoTestPlanLookUpRecord}"  ParentObjectName=""  BrokerId="{!v.testPlanId}"/>
+        </div> 
+        <!--Example Url URL field-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <ui:inputURL aura:id="url" label="Example URL" class="field" value="{!v.exampleUrl}"/>
+        </div>
+        <!--Test plan detail lookup field-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <c:ServiceCloudCustomLookup objectAPIName="PlatinumPMO__Test_Plan_Details__c" IconName="custom:custom18" label="Test Plan Detail" selectedRecord="{!v.testPlanDetailLookUpRecord}"  ParentObjectName=""  BrokerId="{!v.testPlanDetailId}"/>
+        </div> 
+        <!--Estimated Efforts number field-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">   
+        <lightning:input type="number" name="input1" label="Estimated Efforts(in hours)" value = "{!v.estimatedEfforts}"/>
+        </div>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/> 
+        
+        <!--Test Step ID text field-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">
+            <ui:inputText label="Test Step ID " class="field" value="{!v.testStep}" updateOn="click"/>
+        </div>
+        
+        
+        <!--Estimated Resolution date date/time field-->
+        
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small">	
+            <ui:inputDateTime aura:id="today" label="Estimated Resolution Date" class="field" displayDatePicker="true" value="{!v.estimatedResolution}"/>
+            
+        </div>    
+<div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/>         
+        <!-- Testing Details Header Starts-->
+        <div class="slds-page-header slds-size--1-of-1 slds-var-p-horizontal_x-small" style="cursor: pointer;" >
+            <section class="slds-clearfix">
+                <div class="slds-float--left">
+                    
+                    <lightning:icon class="slds-hide" aura:id="articleTwo" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/>
+                </div>
+                <div class="slds-m-left--small">Historical Comment Overview </div>
+            </section>
+        </div>
+        <!-- Testing Details Header End-->
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/>
+        <!--Historical comments rich text field area-->
+        &nbsp; Historical Comments: &nbsp;
+        <lightning:inputRichText value="{!v.historicalComment}" label="Historical Comments" required = "true" placeholder="" class="slds-size--1-of-1 slds-var-p-horizontal_x-small" aura:id="objective">
+            <lightning:insertImageButton/>
+        </lightning:inputRichText>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <div class="slds-size_1-of-2 slds-var-p-horizontal_x-small"/>
+        <br/>
+        
+        
+    </div>
+    <footer class="slds-modal__footer">
+        <!-- Neutral variant (default) -->  
+        
+        <lightning:button label="Cancel" title="Neutral action" onclick="{! c.cancel }"/>
+        <!-- Brand variant: Identifies the primary action in a group of buttons -->
+        <lightning:button variant="brand" label="Save" title="Brand action" onclick="{! c.handelSave }" />
+    </footer>
+     <!-- Spinner Added -->
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <!--Spinner End-->
+</aura:component>

@@ -1,0 +1,8 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+	
+<div style="position:absolute; width:100%; height: 100%">
+   
+   <lightning:container  aura:id="jsApp" src="{!$Resource.SwimlaneDiagram+ '/index.html'}" />
+    
+</div>
+</aura:component>
